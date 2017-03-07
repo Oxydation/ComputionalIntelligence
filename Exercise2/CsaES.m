@@ -13,25 +13,32 @@
 % output
 % g - generations needed
 % stats - various statistic values (fitnessVal)
-function[g, stats] = CsaES(y, s = 1, sigma = 1, sigmaStop = 10^(-5), mu, lambda, fun, funopt = [])
+function[g, stats] = CsaES(y, sigma = 1, sigmaStop = 10^(-5), gLimit, mu, lambda, fun, funopt = [])
   g = 0;
   yNew = y;
   sigmaParent = sigma;
-  sNew = s;
+  %sNew = s;
   N = length(y);
   c = 1/sqrt(N);
   D = sqrt(N);
+  sNew = zeros(N,1);
   offsprings = cell(1, lambda); % create initial offsprings
+  offspringsMutations = cell(1, lambda);  
+  parentsMutation = cell(1,mu);
+  randn('state',7);
   
   do
     % create offsprings and calc fitness
     for l=1:lambda
       % mutations =  % generate random values normalverteilt N dimensional, isotrophic gaussian mutation 
-      yl = yNew + sigmaParent * randn(N, 1); % get new y point of offspring      
-      fl = feval(fun, yl ,[]); % get fitness value of offspring
+      mutation = randn(N,1);
+      
+      yl = yNew + sigmaParent * mutation % get new y point of offspring      
+      fl = feval(fun, yl , funopt); % get fitness value of offspring
       
       % Store new fitness and point of offspring
       offsprings(l) = yl;
+      offspringsMutations(l) = mutation;
       offspringsFitness(l) = fl;   
     end
     
@@ -42,8 +49,7 @@ function[g, stats] = CsaES(y, s = 1, sigma = 1, sigmaStop = 10^(-5), mu, lambda,
       indexBestOffspring = find(offspringsFitness == bestFitness);
       
       % set best offspring as parent
-      parentsFitness(k) = offspringsFitness(indexBestOffspring);
-      parents(k) = offsprings(indexBestOffspring);
+      parentsMutation(k) = offspringsMutations(indexBestOffspring);
       
       % set fitness of current best offspring to infinity
       offspringsFitness(indexBestOffspring) = Inf;
@@ -51,7 +57,7 @@ function[g, stats] = CsaES(y, s = 1, sigma = 1, sigmaStop = 10^(-5), mu, lambda,
     
     nRecombination = 0;
     for l=1:mu
-      nRecombination += cell2mat(parents(l));
+      nRecombination += cell2mat(parentsMutation(l));
     end
     nRecombination = nRecombination / mu;
     
@@ -60,13 +66,18 @@ function[g, stats] = CsaES(y, s = 1, sigma = 1, sigmaStop = 10^(-5), mu, lambda,
     % produce new parent and cumulate new search path
     yNew = yNew + sigmaParent * nRecombination;
     sNew = (1 - c)*sNew + sqrt(mu*c*(2-c)) * nRecombination;
+    fNew = feval(fun, yNew ,funopt);  
     
     % calc new mutation strength
     eChi = sqrt(N) *(1-N^(-1)/4+N^(-2)/21);    
-    sigmaParent = sigmaParent * exp((norm(sNew) - eChi)/D*eChi );   
+    sigmaParent = sigmaParent * exp((norm(sNew) - eChi)/(D*eChi) );   
   
-    g++; 
-    fNew = feval(fun, yNew ,[]);  
+    g++;     
     stats.fitnessVal(g) = fNew;
-  until(sigmaParent < sigmaStop);
+    stats.sigma(g) = sigmaParent;
+    
+     % normalise mutation strength
+    sigmaNorm = sigmaParent / sqrt(fNew) * N; % Restzielabstand bei kugel: sqrt(fnew) 
+    stats.sigmaNorm(g) = sigmaNorm;
+  until(sigmaParent < sigmaStop || g >= gLimit);
 end

@@ -1,24 +1,44 @@
 N = 40;
 y = ones(N, 1);
 sigma = 1;
-sigmaStop = 10^(-4);
+sigmaStop = 10^(-5);
 mu = 3;
 lambda = 10;
 gLimit = 2000;
-s = 1;
-funValStop = 10^(-10);
 
-[g, stats] = CsaES(y, s, sigma, sigmaStop, mu, lambda, "Sphere")
+[gCsa, statsCsa] = CsaES(y, sigma, sigmaStop, gLimit, mu, lambda, "Sphere")
 
-% Display fitness over generations
+% Display function over generations
 figure
-semilogy(stats.fitnessVal, "Color", "r", "linewidth", 1)
+semilogy(statsCsa.fitnessVal, "Color", "r", "linewidth", 1)
 hold on
 
-[parentsRecomb, fp, g, stats] = MuMuILambdaESFunvalStop(y, sigma, funValStop, gLimit, mu, lambda, "Sphere");
-semilogy(stats.funval, "Color", "m", "linewidth", 1)
+[parentsRecomb, fp, g, statsSigmaSa] = MuMuILambdaES(y, sigma, sigmaStop, gLimit, mu, lambda, "Sphere");
+semilogy(statsSigmaSa.funval, "Color", "m", "linewidth", 1)
 
-legend("Meta-ES (\gamma = 1)", "Recombination - Self Adaption-ES");
+legend("(3/3, 10)-CSA-ES", "(3/3,10)-{\sigma}SA-ES");
 xlabel("# Generations");
 ylabel("Fitness Value");
 title("Ex 2 - CSA-ES - Dynamics of Fitness vs. Generations, (3/3, 10), N = 40");
+
+% Display sigma values over generations
+figure
+semilogy(statsCsa.sigma, "Color", "r", "linewidth", 1)
+hold on
+semilogy(statsSigmaSa.sigma, "Color", "m", "linewidth", 1);
+
+legend("(3/3, 10)-CSA-ES", "(3/3,10)-{\sigma}SA-ES");
+xlabel("# Generations");
+ylabel("Sigma");
+title("Ex 2 - CSA-ES - Dynamics of Sigma vs. Generations, (3/3, 10), N = 40");
+
+% Display sigma values over generations
+figure
+semilogy(statsCsa.sigmaNorm, "Color", "r", "linewidth", 1)
+hold on
+semilogy(statsSigmaSa.sigmaNorm, "Color", "m", "linewidth", 1);
+
+legend("(3/3, 10)-CSA-ES", "(3/3,10)-{\sigma}SA-ES");
+xlabel("# Generations");
+ylabel("Normalized Sigma");
+title("Ex 2 - CSA-ES - Dynamics of normalized Sigma vs. Generations, (3/3, 10), N = 40");
