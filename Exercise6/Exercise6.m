@@ -38,6 +38,7 @@ for f = 1:sizeof(functions)
   xlabel("Generations");
   ylabel("Sigma");
   title(strcat(fun, ": Sigma Dyn."));
+  
   outputFile = strcat(fun,"_csa_cma_ssa.pdf");
   orient ("landscape")
   print(outputFile);
