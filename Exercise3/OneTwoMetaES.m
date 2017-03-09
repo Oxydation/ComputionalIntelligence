@@ -25,6 +25,7 @@ function[g, stats] = OneTwoMetaES(y, sigma = 1, funValStop = 10^(-10), alpha = 1
   fitnessHistory = [];
   sigmaHistory = [];
   fitnessHistoryFunEval = [];
+  stats.yMeanPerGeneration = zeros(1, gLimit);
   
   do
     % Calculate new sigmas (mutation strengths)
@@ -56,10 +57,10 @@ function[g, stats] = OneTwoMetaES(y, sigma = 1, funValStop = 10^(-10), alpha = 1
      sigmaHistory = [sigmaHistory ; sigmaParent]
      fitnessHistory = [fitnessHistory ; fitnessParent]
      
-      % calc mean per generation
-      ySquare = yNew.^2;
-      sum1 = sum(ySquare(1:N));
-      stats.yMeanPerGeneration(g) = sum1/N;
+     % calc mean per generation
+     ySquare = yNew.^2;
+     sum1 = sum(ySquare(1:N));
+     stats.yMeanPerGeneration(g) = sum1/N;
   until(fitnessParent < funValStop || g > gLimit);
   stats.fitnessHistory = fitnessHistory;
   stats.sigmaHistory = sigmaHistory;

@@ -13,33 +13,40 @@
 % output
 % g - generations needed
 % stats - various statistic values (fitnessVal)
-function[g, stats] = CsaES(y, sigma = 1, sigmaStop = 10^(-5), gLimit, mu, lambda, fun, funopt = [])
-  g = 0;
+function[g, stats] = CMAES(y, sigma = 1, sigmaStop = 10^(-5), gLimit, mu, lambda, fun, funopt = [])
+  g = 0;  
+  N = length(y);
   yNew = y;
   sigmaParent = sigma;
-  %sNew = s;
-  N = length(y);
+  Cov = eye(N,N);
   c = 1/sqrt(N);
   D = sqrt(N);
+  v = ones(N,1); % evolution path vector 
+  c = 1/sqrt(N);
+  cv = 1/sqrt(N);
+  cc = 2/(N*sqrt(2))^2;
   sNew = zeros(N,1);
   offsprings = cell(1, lambda); % create initial offsprings
   offspringsMutations = cell(1, lambda);  
   parentsMutation = cell(1,mu);
-   stats.yMeanPerGeneration = zeros(1, gLimit);
-  %randn('state',7);
+  parentsW = cell(1,mu);
+  offspringsW = cell(1,lambda);
   
   do
+   M = chol(Cov)';
+   
     % create offsprings and calc fitness
     for l=1:lambda
       % mutations =  % generate random values normalverteilt N dimensional, isotrophic gaussian mutation 
-      mutation = randn(N,1);
-      
-      yl = yNew + sigmaParent * mutation % get new y point of offspring      
+      n = randn(N,1);     
+      w = M*n; % correlierte search direction
+      yl = yNew + sigmaParent * n % get new y point of offspring      
       fl = feval(fun, yl , funopt); % get fitness value of offspring
       
       % Store new fitness and point of offspring
       offsprings(l) = yl;
-      offspringsMutations(l) = mutation;
+      offspringsW(l) = w;
+      offspringsMutations(l) = n;
       offspringsFitness(l) = fl;   
     end
     
@@ -51,6 +58,7 @@ function[g, stats] = CsaES(y, sigma = 1, sigmaStop = 10^(-5), gLimit, mu, lambda
       
       % set best offspring as parent
       parentsMutation(k) = offspringsMutations(indexBestOffspring);
+      parentsW(k) = offspringsW(indexBestOffspring);
       
       % set fitness of current best offspring to infinity
       offspringsFitness(indexBestOffspring) = Inf;
@@ -62,7 +70,17 @@ function[g, stats] = CsaES(y, sigma = 1, sigmaStop = 10^(-5), gLimit, mu, lambda
     end
     nRecombination = nRecombination / mu;
     
+    wRecombination = 0;
+    for l=1:mu
+      wRecombination += cell2mat(parentsW(l));
+    end
+    wRecombination = wRecombination / mu;
+    
     % end of recombnation
+    
+    % CMA speciality
+    v = (1-cv) * v + sqrt(mu*cv*(2-cv))*wRecombination; 
+    Cov = (1-cc) * Cov + cc*v*v'; % calc new covariance matrix
     
     % produce new parent and cumulate new search path
     yNew = yNew + sigmaParent * nRecombination;
@@ -79,11 +97,6 @@ function[g, stats] = CsaES(y, sigma = 1, sigmaStop = 10^(-5), gLimit, mu, lambda
     
      % normalise mutation strength
     sigmaNorm = sigmaParent / sqrt(fNew) * N; % Restzielabstand bei kugel: sqrt(fnew) 
-    stats.sigmaNorm(g) = sigmaNorm;
-    
-    % calc mean per generation
-    ySquare = yNew.^2;
-    sum1 = sum(ySquare(1:N));
-    stats.yMeanPerGeneration(g) = sum1/N;
+    stats.sigmaNorm(g) = sigmaNorm;    
   until(sigmaParent < sigmaStop || g >= gLimit);
 end

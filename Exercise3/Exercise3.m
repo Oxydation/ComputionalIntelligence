@@ -5,12 +5,12 @@ sigmaStop = 10^(-5);
 funValStop = 10^(-8);
 mu = 3;
 lambda = 10;
-gLimit = 1000;
+gLimit = 4000;
 gamma = 1;
 alpha = 1.2;
-rounds = 10;
-yOneTwoMetaSum = 0;
-yCsaEsSum = 0;
+rounds = 2;
+yOneTwoMetaSum = zeros(1, gLimit);
+yCsaEsSum = zeros(1, gLimit);
 
 % Let 1,2-Meta-ES and CSA-ES run for a couple of rounds and calculate mean per generation
 for i=1:rounds
