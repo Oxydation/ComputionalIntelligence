@@ -1,5 +1,5 @@
 % author: Mathias Nigsch
-% implementation for [1,2]-Meta-ES Algorithm
+% implementation for CMA-ES with Rank-µ-Update
 
 % input
 % y - initial point N dimensional [Nx1]
@@ -13,7 +13,7 @@
 % output
 % g - generations needed
 % stats - various statistic values (fitnessVal)
-function[g, stats] = CMAES(y, sigma = 1, sigmaStop = 10^(-5), gLimit, mu, lambda, fun, funopt = [])
+function[g, stats] = CMARankES(y, sigma = 1, sigmaStop = 10^(-5), gLimit, mu, lambda, fun, funopt = [])
   g = 0;  
   N = length(y);
   yNew = y;
@@ -32,10 +32,7 @@ function[g, stats] = CMAES(y, sigma = 1, sigmaStop = 10^(-5), gLimit, mu, lambda
   parentsW = cell(1,mu);
   offspringsW = cell(1,lambda);
   
-  do
-  % [u, gamma] = eig(Cov);
-  % M = u*sqrt(gamma)*u';
-  
+  do  
    M = chol(Cov)';
    
     % create offsprings and calc fitness
@@ -43,7 +40,7 @@ function[g, stats] = CMAES(y, sigma = 1, sigmaStop = 10^(-5), gLimit, mu, lambda
       % mutations =  % generate random values normalverteilt N dimensional, isotrophic gaussian mutation 
       n = randn(N,1);     
       w = M*n; % correlierte search direction
-      yl = yNew + sigmaParent * n % get new y point of offspring      
+      yl = yNew + sigmaParent * w; % get new y point of offspring      
       fl = feval(fun, yl , funopt); % get fitness value of offspring
       
       % Store new fitness and point of offspring
@@ -83,7 +80,10 @@ function[g, stats] = CMAES(y, sigma = 1, sigmaStop = 10^(-5), gLimit, mu, lambda
     
     % CMA speciality
     v = (1-cv) * v + sqrt(mu*cv*(2-cv))*wRecombination; 
-    Cov = (1-cc) * Cov + cc*v*v'; % calc new covariance matrix
+    
+    % Rank-µ-Update
+    ww = 1/mu *sum(w(1:mu)*w(1:mu)');
+    Cov = (1-cc) * Cov + cc*((1/mu)*v*v' + (1- 1/mu) * ww) ; % calc new covariance matrix
     
     % produce new parent and cumulate new search path
     yNew = yNew + sigmaParent * nRecombination;
