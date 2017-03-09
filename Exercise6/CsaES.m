@@ -26,7 +26,6 @@ function[g, stats] = CsaES(y, sigma = 1, sigmaStop = 10^(-5), gLimit, mu, lambda
   offspringsMutations = cell(1, lambda);  
   parentsMutation = cell(1,mu);
    stats.yMeanPerGeneration = zeros(1, gLimit);
-  %randn('state',7);
   
   do
     % create offsprings and calc fitness
@@ -34,7 +33,7 @@ function[g, stats] = CsaES(y, sigma = 1, sigmaStop = 10^(-5), gLimit, mu, lambda
       % mutations =  % generate random values normalverteilt N dimensional, isotrophic gaussian mutation 
       mutation = randn(N,1);
       
-      yl = yNew + sigmaParent * mutation % get new y point of offspring      
+      yl = yNew + sigmaParent * mutation; % get new y point of offspring      
       fl = feval(fun, yl , funopt); % get fitness value of offspring
       
       % Store new fitness and point of offspring

@@ -43,7 +43,7 @@ function[g, stats] = CMAES(y, sigma = 1, sigmaStop = 10^(-5), gLimit, mu, lambda
       % mutations =  % generate random values normalverteilt N dimensional, isotrophic gaussian mutation 
       n = randn(N,1);     
       w = M*n; % correlierte search direction
-      yl = yNew + sigmaParent * n % get new y point of offspring      
+      yl = yNew + sigmaParent * n; % get new y point of offspring      
       fl = feval(fun, yl , funopt); % get fitness value of offspring
       
       % Store new fitness and point of offspring
