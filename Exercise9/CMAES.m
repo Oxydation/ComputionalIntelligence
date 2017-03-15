@@ -86,7 +86,7 @@ function[g, stats] = CMAES(y, sigma = 1, sigmaStop = 10^(-5), gLimit, mu, lambda
     Cov = (1-cc) * Cov + cc*v*v'; % calc new covariance matrix
     
     % produce new parent and cumulate new search path
-    yNew = yNew + sigmaParent * nRecombination;
+    yNew = yNew + sigmaParent * wRecombination;
     sNew = (1 - c)*sNew + sqrt(mu*c*(2-c)) * nRecombination;
     fNew = feval(fun, yNew ,funopt);  
     

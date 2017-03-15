@@ -1,5 +1,5 @@
 % author: Mathias Nigsch
-% implementation for CMA-ES with Rank-µ-Update
+% implementation for [1,2]-Meta-ES Algorithm
 
 % input
 % y - initial point N dimensional [Nx1]
@@ -13,42 +13,32 @@
 % output
 % g - generations needed
 % stats - various statistic values (fitnessVal)
-function[g, stats] = CMARankES(y, sigma = 1, sigmaStop = 10^(-5), gLimit, mu, lambda, fun, funopt = [])
-  g = 0;  
-  N = length(y);
+function[g, stats] = CsaES(y, sigma = 1, sigmaStop = 10^(-5), gLimit, mu, lambda, fun, funopt = [])
+  g = 0;
   yNew = y;
   sigmaParent = sigma;
-  Cov = eye(N,N);
+  %sNew = s;
+  N = length(y);
   c = 1/sqrt(N);
   D = sqrt(N);
-  v = ones(N,1); % evolution path vector 
-  c = 1/sqrt(N);
-  cv = 1/sqrt(N);
-  cc = 2/(N*sqrt(2))^2;
   sNew = zeros(N,1);
   offsprings = cell(1, lambda); % create initial offsprings
   offspringsMutations = cell(1, lambda);  
   parentsMutation = cell(1,mu);
-  parentsW = cell(1,mu);
-  parentsWW = zeros(N,N);
-  offspringsW = cell(1,lambda);
-  offspringsWW = eye(N,N);
+   stats.yMeanPerGeneration = zeros(1, gLimit);
   
-  do  
-   M = chol(Cov)';
-   
+  do
     % create offsprings and calc fitness
     for l=1:lambda
       % mutations =  % generate random values normalverteilt N dimensional, isotrophic gaussian mutation 
-      n = randn(N,1);     
-      w = M*n; % correlierte search direction
-      yl = yNew + sigmaParent * w; % get new y point of offspring      
+      mutation = randn(N,1);
+      
+      yl = yNew + sigmaParent * mutation; % get new y point of offspring      
       fl = feval(fun, yl , funopt); % get fitness value of offspring
       
       % Store new fitness and point of offspring
       offsprings(l) = yl;
-      offspringsW(l) = w;
-      offspringsMutations(l) = n;
+      offspringsMutations(l) = mutation;
       offspringsFitness(l) = fl;   
     end
     
@@ -60,41 +50,21 @@ function[g, stats] = CMARankES(y, sigma = 1, sigmaStop = 10^(-5), gLimit, mu, la
       
       % set best offspring as parent
       parentsMutation(k) = offspringsMutations(indexBestOffspring);
-      parentsW(k) = offspringsW(indexBestOffspring);
+      
       % set fitness of current best offspring to infinity
       offspringsFitness(indexBestOffspring) = Inf;
     end  
     
-    % needed?
     nRecombination = 0;
     for l=1:mu
       nRecombination += cell2mat(parentsMutation(l));
     end
     nRecombination = nRecombination / mu;
     
-    wRecombination = 0;
-    for l=1:mu
-      wRecombination += cell2mat(parentsW(l));
-    end
-    wRecombination = wRecombination / mu;
-        
     % end of recombnation
     
-    % CMA speciality
-    v = (1-cv) * v + sqrt(mu*cv*(2-cv))*wRecombination; 
-    
-    wwRecombination = zeros(N,N);
-    for l=1:mu
-      wwRecombination += cell2mat(parentsW(l))*cell2mat(parentsW(l))';
-    end
-    % Rank-µ-Update
-    %ww = zeros(N,N);
-    %ww = w * w'; 
-    %ww = 1/mu *wwSum; %*sum(w(1:mu)*w(1:mu)');
-    Cov = (1-cc) * Cov + cc*((1/mu)*v*v' + (1- 1/mu) * wwRecombination) ; % calc new covariance matrix
-    
     % produce new parent and cumulate new search path
-    yNew = yNew + sigmaParent * wRecombination; % should we use nRecomb or wRecomb?
+    yNew = yNew + sigmaParent * nRecombination;
     sNew = (1 - c)*sNew + sqrt(mu*c*(2-c)) * nRecombination;
     fNew = feval(fun, yNew ,funopt);  
     
@@ -108,6 +78,11 @@ function[g, stats] = CMARankES(y, sigma = 1, sigmaStop = 10^(-5), gLimit, mu, la
     
      % normalise mutation strength
     sigmaNorm = sigmaParent / sqrt(fNew) * N; % Restzielabstand bei kugel: sqrt(fnew) 
-    stats.sigmaNorm(g) = sigmaNorm;    
+    stats.sigmaNorm(g) = sigmaNorm;
+    
+    % calc mean per generation
+    ySquare = yNew.^2;
+    sum1 = sum(ySquare(1:N));
+    stats.yMeanPerGeneration(g) = sum1/N;
   until(sigmaParent < sigmaStop || g >= gLimit);
 end

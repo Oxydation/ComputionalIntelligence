@@ -7,7 +7,7 @@ mu = 3;
 lambda = 10;
 gLimit = 1000;
 
-functions = {'Cigar';'CigarTablet';'Ellipsoid2';'ParabolicRidge';'SharpRidge';'DifferentPowers'};
+functions = {'Cigar';'Tablet';'Ellipsoid2';'ParabolicRidge';'SharpRidge';'DifferentPowers'};
 
 for f = 1:sizeof(functions)
   fun = functions{f};
