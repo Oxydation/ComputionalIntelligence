@@ -1,11 +1,11 @@
 N = 30;
 y = ones(N, 1);
 sigma = 1;
-sigmaStop = 10^(-5);
+sigmaStop = 10^(-10);
 funValStop = 10^(-8);
 mu = 3;
 lambda = 10;
-gLimit = 1000;
+gLimit = 2500;
 
 functions = {'Cigar';'Tablet';'Ellipsoid2';'ParabolicRidge';'SharpRidge';'DifferentPowers'};
 

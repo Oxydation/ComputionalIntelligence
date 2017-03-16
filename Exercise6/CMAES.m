@@ -32,10 +32,7 @@ function[g, stats] = CMAES(y, sigma = 1, sigmaStop = 10^(-5), gLimit, mu, lambda
   parentsW = cell(1,mu);
   offspringsW = cell(1,lambda);
   
-  do
-  % [u, gamma] = eig(Cov);
-  % M = u*sqrt(gamma)*u';
-  
+  do  
    M = chol(Cov)';
    
     % create offsprings and calc fitness
@@ -43,7 +40,7 @@ function[g, stats] = CMAES(y, sigma = 1, sigmaStop = 10^(-5), gLimit, mu, lambda
       % mutations =  % generate random values normalverteilt N dimensional, isotrophic gaussian mutation 
       n = randn(N,1);     
       w = M*n; % correlierte search direction
-      yl = yNew + sigmaParent * n; % get new y point of offspring      
+      yl = yNew + sigmaParent * w; % get new y point of offspring      
       fl = feval(fun, yl , funopt); % get fitness value of offspring
       
       % Store new fitness and point of offspring
@@ -86,7 +83,7 @@ function[g, stats] = CMAES(y, sigma = 1, sigmaStop = 10^(-5), gLimit, mu, lambda
     Cov = (1-cc) * Cov + cc*v*v'; % calc new covariance matrix
     
     % produce new parent and cumulate new search path
-    yNew = yNew + sigmaParent * nRecombination;
+    yNew = yNew + sigmaParent * wRecombination;
     sNew = (1 - c)*sNew + sqrt(mu*c*(2-c)) * nRecombination;
     fNew = feval(fun, yNew ,funopt);  
     
