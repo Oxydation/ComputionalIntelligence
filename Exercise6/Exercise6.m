@@ -8,6 +8,7 @@ lambda = 10;
 gLimit = 2500;
 
 functions = {'Cigar';'Tablet';'Ellipsoid2';'ParabolicRidge';'SharpRidge';'DifferentPowers'};
+%functions = {'Tablet'};
 
 for f = 1:sizeof(functions)
   fun = functions{f};

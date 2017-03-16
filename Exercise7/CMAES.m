@@ -32,11 +32,13 @@ function[g, stats] = CMAES(y, sigma = 1, sigmaStop = 10^(-5), gLimit, mu, lambda
   parentsW = cell(1,mu);
   offspringsW = cell(1,lambda);
   
-  do
-  % [u, gamma] = eig(Cov);
-  % M = u*sqrt(gamma)*u';
-  
-   M = chol(Cov)';
+  do  
+    [u,gamma] = eig(Cov);
+    eigValues = diag(gamma);
+    maxEigValue = max(eigValues);
+    minEigValue = min(eigValues);
+    relationMaxMinEigValue = maxEigValue/minEigValue;
+    M = chol(Cov)';
    
     % create offsprings and calc fitness
     for l=1:lambda
@@ -97,6 +99,9 @@ function[g, stats] = CMAES(y, sigma = 1, sigmaStop = 10^(-5), gLimit, mu, lambda
     g++;     
     stats.fitnessVal(g) = fNew;
     stats.sigma(g) = sigmaParent;
+    stats.maxEigValues(g) = maxEigValue;
+    stats.minEigValues(g) = minEigValue;
+    stats.minMaxEigValues(g) = relationMaxMinEigValue;
     
      % normalise mutation strength
     sigmaNorm = sigmaParent / sqrt(fNew) * N; % Restzielabstand bei kugel: sqrt(fnew) 
