@@ -24,7 +24,7 @@ function[g, stats] = CMARankES(y, sigma = 1, sigmaStop = 10^(-5), gLimit, mu, la
   v = ones(N,1); % evolution path vector 
   c = 1/sqrt(N);
   cv = 1/sqrt(N);
-  cc = 2/(N*sqrt(2))^2;
+  cc = 2/(N+sqrt(2))^2;
   sNew = zeros(N,1);
   offsprings = cell(1, lambda); % create initial offsprings
   offspringsMutations = cell(1, lambda);  

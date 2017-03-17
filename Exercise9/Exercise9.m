@@ -1,14 +1,14 @@
 N = 30;
 y = ones(N, 1);
 sigma = 1;
-sigmaStop = 10^(-5);
+sigmaStop = 10^(-8);
 funValStop = 10^(-8);
 mu = 3;
 lambda = 10;
 gLimit = 3000;
 
-functions = {'Cigar';'Tablet';'Ellipsoid2';'ParabolicRidge';'SharpRidge';'DifferentPowers'};
-
+%functions = {'Cigar';'Tablet';'Ellipsoid2';'ParabolicRidge';'SharpRidge';'DifferentPowers'};
+functions = {'Cigar'};
 for f = 1:sizeof(functions)
   fun = functions{f};
   
@@ -43,7 +43,7 @@ for f = 1:sizeof(functions)
   hold on;
   semilogy(statsCsa2.fitnessVal, "Color", "y", "linewidth", 1);
 
-  legend("(3/3,12)-CMA-ES", "(3/3,12)-CMA-ES w. Rank-\mu","(3/3,12)-CSA-ES", "(30/30,120)-CMA-ES", "(30/30,120)-CMA-ES w. Rank-\mu", "(30/30,120)-CSA-ES");
+  %legend("(3/3,12)-CMA-ES", "(3/3,12)-CMA-ES w. Rank-\mu","(3/3,12)-CSA-ES", "(30/30,120)-CMA-ES", "(30/30,120)-CMA-ES w. Rank-\mu", "(30/30,120)-CSA-ES");
   xlabel("Generations");
   ylabel("Fitness Value");
   title(strcat(fun, ": Fitness Dyn."));

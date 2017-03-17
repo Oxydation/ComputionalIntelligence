@@ -7,8 +7,8 @@ mu = 3;
 lambda = 10;
 gLimit = 2500;
 
-functions = {'Cigar';'Tablet';'Ellipsoid2';'ParabolicRidge';'SharpRidge';'DifferentPowers'};
-%functions = {'ParabolicRidge'};
+%functions = {'Cigar';'Tablet';'Ellipsoid2';'ParabolicRidge';'SharpRidge';'DifferentPowers'};
+functions = {'ParabolicRidge'};
 
 for f = 1:sizeof(functions)
   fun = functions{f};
@@ -19,11 +19,11 @@ for f = 1:sizeof(functions)
   % Display function over generations
   figure
   subplot(1,2,1) % fitnessvalues
-  semilogy(statsCsa.fitnessVal, "Color", "b", "linewidth", 1);
+  semilogy(abs(statsCsa.fitnessVal), "Color", "b", "linewidth", 1);
   hold on;
-  semilogy(statsCma.fitnessVal, "Color", "r", "linewidth", 1);
+  semilogy(abs(statsCma.fitnessVal), "Color", "r", "linewidth", 1);
   hold on;
-  semilogy(statsMuMuLambdaEs.fitnessVal, "Color", "c", "linewidth", 1);
+  semilogy(abs(statsMuMuLambdaEs.fitnessVal), "Color", "c", "linewidth", 1);
   legend("CSA-ES", "CMA-ES", "Sigma-SA-ES");
   xlabel("Generations");
   ylabel("Fitness Value");
