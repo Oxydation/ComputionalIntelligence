@@ -13,8 +13,9 @@
 % output
 % g - generations needed
 % stats - various statistic values (fitnessVal)
-function[g, stats] = CMARankES(y, sigma = 1, sigmaStop = 10^(-5), gLimit, mu, lambda, fun, funopt = [])
-  g = 0;  
+function[fp, g, stats] = CMARankES(y, sigma = 1, sigmaStop = 10^(-5), gLimit, mu, lambda, fun, fitnessTarget, funopt = [])
+  g = 0; 
+  stats.funEvals = 0; 
   N = length(y);
   yNew = y;
   sigmaParent = sigma;
@@ -44,7 +45,7 @@ function[g, stats] = CMARankES(y, sigma = 1, sigmaStop = 10^(-5), gLimit, mu, la
       w = M*n; % correlierte search direction
       yl = yNew + sigmaParent * w; % get new y point of offspring      
       fl = feval(fun, yl , funopt); % get fitness value of offspring
-      
+      stats.funEvals++; 
       % Store new fitness and point of offspring
       offsprings(l) = yl;
       offspringsW(l) = w;
@@ -97,7 +98,7 @@ function[g, stats] = CMARankES(y, sigma = 1, sigmaStop = 10^(-5), gLimit, mu, la
     yNew = yNew + sigmaParent * wRecombination; % should we use nRecomb or wRecomb?
     sNew = (1 - c)*sNew + sqrt(mu*c*(2-c)) * nRecombination;
     fNew = feval(fun, yNew ,funopt);  
-    
+    stats.funEvals++; 
     % calc new mutation strength
     eChi = sqrt(N) *(1-N^(-1)/4+N^(-2)/21);    
     sigmaParent = sigmaParent * exp((norm(sNew) - eChi)/(D*eChi) );   
@@ -108,6 +109,7 @@ function[g, stats] = CMARankES(y, sigma = 1, sigmaStop = 10^(-5), gLimit, mu, la
     
      % normalise mutation strength
     sigmaNorm = sigmaParent / sqrt(fNew) * N; % Restzielabstand bei kugel: sqrt(fnew) 
-    stats.sigmaNorm(g) = sigmaNorm;    
-  until(sigmaParent < sigmaStop || g >= gLimit);
+    stats.sigmaNorm(g) = sigmaNorm; 
+    fp = fNew;   
+  until(sigmaParent < sigmaStop || g >= gLimit || fNew <= fitnessTarget);
 end

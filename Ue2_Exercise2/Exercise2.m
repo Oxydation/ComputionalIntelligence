@@ -3,7 +3,7 @@ sigma = 1;
 sigmaStop = 10^(-5);
 mu = 3;
 lambda = 12;
-gLimit = 500;
+gLimit = 200;
 independentRuns = 15;
 fitnessTarget = 10^(-4);
 
@@ -14,11 +14,11 @@ for round = 1:size(dimensions)
   runsToSuccess = 0; % count the runs, until we get a success
   % run the test a couple of times independent with the same dimension
   
+  N = dimensions{round};
   printf("%s, N=%d\n", 'Sphere', N);
   for run = 1:independentRuns
-      N = dimensions{round};
       yParent = ones(N, 1)*10;
-      [parentsRecomb, fp, g, stats] = MuMuILambdaES(yParent, sigma, sigmaStop, gLimit, mu, lambda,"Sphere", fitnessTarget );
+      [fp, g, stats] =  CMARankES(yParent, sigma, sigmaStop, gLimit, mu, lambda, "Sphere", fitnessTarget);
       ertTotalSphere += stats.funEvals;  % sum up total function evaluations
       
       if(fp < fitnessTarget)
@@ -35,11 +35,11 @@ for round = 1:size(dimensions)
   runsToSuccess = 0; % count the runs, until we get a success
   % run the test a couple of times independent with the same dimension
   
+  N = dimensions{round};
   printf("%s, N=%d\n", 'Ellipsoid', N);
   for run = 1:independentRuns
-      N = dimensions{round};
       yParent = ones(N, 1)*10;
-      [parentsRecomb, fp, g, stats] = MuMuILambdaES(yParent, sigma, sigmaStop, gLimit, mu, lambda,"Ellipsoid1", fitnessTarget );
+      [fp, g, stats] =  CMARankES(yParent, sigma, sigmaStop, gLimit, mu, lambda, "Ellipsoid1", fitnessTarget);
       ertTotalEllipsoid1 += stats.funEvals;  % sum up total function evaluations
       
       if(fp < fitnessTarget)
