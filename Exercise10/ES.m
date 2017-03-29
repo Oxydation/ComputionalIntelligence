@@ -20,6 +20,8 @@ function[fp, parentsRecomb, funEvalCounter, funEvalHistory] = ES(mu = 1,lambda =
   sigmaNew = sigma;
   funEvalHistory = [];
   offsprings = cell(1, lambda); % create initial offsprings
+  parentsFitness = cell(1,mu);
+  parents = cell(1,mu);
   
   for i=1:gamma
     for j=1:lambda

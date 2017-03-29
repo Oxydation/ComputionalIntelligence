@@ -2,7 +2,7 @@ N = 30;
 y = ones(N, 1);
 sigma = 1;
 sigmaStop = 10^(-5);
-funValStop = 10^(-5);
+funValStop = -Inf;
 mu = 3;
 lambda = 10;
 gLimit = 10000;
@@ -17,15 +17,22 @@ for round = 0:9
   [gOneTwoMeta, statsOneTwoMeta] = OneTwoMetaES(y, sigma, funValStop, alpha, mu, lambda, gamma, gLimit, "SharpRidgeFive");
     
   subplot(1,2,1) % fitnessvalues
-  semilogy(statsOneTwoMeta.funval,  "linewidth", 1);
+  %semilogy(statsOneTwoMeta.funval,  "linewidth", 1);
+   plot(statsOneTwoMeta.funval, "linewidth", 1);
   hold on;
  
   subplot(1,2,2) % sigma values
-  semilogy(statsOneTwoMeta.sigma,  "linewidth", 1);
+  %semilogy(statsOneTwoMeta.sigma,  "linewidth", 1);
+  plot(statsOneTwoMeta.sigma, "linewidth", 1);
   hold on;
  end
  
- subplot(1,2,1) % fitnessvalues
+ % Ergebnis sollte zeigen, dass ab einer bestimmte Isolation die Verbesserung funktioniert, ansonsten hört es auf
+ % Isolation von sigma herausfinden ob großes oder kleines sigma 
+ % mutationsball verhindert, dass die mutatinen zu nahe an die x achse kommen und das sigma groß bleibt, damit der algo nicht stecken bleibt
+ % durch isolierung wird der mutationsball (sigma bleibt gleich) nicht verkleinert
+ 
+  subplot(1,2,1) % fitnessvalues
   legend("gamma = 2^0", "gamma = 2^1", "gamma = 2^2", "gamma = 2^3", "gamma = 2^4", "gamma = 2^5", "gamma = 2^6", "gamma = 2^7", "gamma = 2^8", "gamma = 2^9");
   xlabel("Generations");
   ylabel("Fitness Value");
