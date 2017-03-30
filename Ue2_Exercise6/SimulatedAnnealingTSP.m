@@ -7,7 +7,7 @@ function[g, fitnessParent, yOffspring, stats] = SimulatedAnnealingTSP(y, tempera
   fitnessParent = TSP(yParent, citiesPosition); %feval(fun, yParent);
   temperature = temperatureInit;
   generation = 0;
-
+  figure
   do
     % Change permutation
     yOffspring = feval("lin2opt",yParent);
@@ -35,6 +35,7 @@ function[g, fitnessParent, yOffspring, stats] = SimulatedAnnealingTSP(y, tempera
     
   until(temperature <= temperatureStop || generation > gLimit) 
  
+    figure
     % print last plot
    plotPath(yParent, citiesPosition, fitnessParent, generation, temperature); 
 end 
@@ -65,24 +66,34 @@ end
 
 %%% plot path %%%
 function plotPath(yParent, citiesPosition, fitnessParent, generationCount, temperature)
+  plot (citiesPosition(:,1), citiesPosition(:,2),'-or','LineWidth',2);
+  drawnow();
+    
   clf; % clear figure
-  for i = 1:size(yParent,1)
-    xValue = citiesPosition(yParent(i),1);
-    yValue = citiesPosition(yParent(i),2);
-    
-    plot(xValue,yValue);
-    hold on;
-    
-    if(i > 1)
-      line ([xValue xValueLast], [yValue yValueLast], "linestyle", "-", "color", "r");
-      hold on
-    end
-    
-    xValueLast = xValue;
-    yValueLast = yValue;
-  end
-  line ([citiesPosition(yParent(1),1) xValueLast], [citiesPosition(yParent(1),2) yValueLast], "linestyle", "-", "color", "r");
+%  for i = 1:size(yParent,1)
+%    xValue = citiesPosition(yParent(i),1);
+%    yValue = citiesPosition(yParent(i),2);
+%    
+%    plot(xValue,yValue);
+%    hold on;
+%    
+%    if(i > 1)
+%      line ([xValue xValueLast], [yValue yValueLast], "linestyle", "-", "color", "m");
+%      hold on
+%    end
+%    
+%    xValueLast = xValue;
+%    yValueLast = yValue;
+%  end
+%  line ([citiesPosition(yParent(1),1) xValueLast], [citiesPosition(yParent(1),2) yValueLast], "linestyle", "-", "color", "r");
   axis off; % remove axis
   title (strcat("Fitness: ", num2str(fitnessParent),", Generation: ", num2str(generationCount), ", Temperature: ", num2str(temperature)));
   drawnow(); % refresh
 end
+
+
+
+%
+%for length citiy postpadexcitypos(i,:)  city_pos(yparent(i),:);
+%  
+%  ext citypos(length(citypos(+1,:)
